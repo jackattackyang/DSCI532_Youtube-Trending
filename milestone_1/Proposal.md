@@ -1,4 +1,4 @@
-## DSCI 532 Data Visualization II &#151; Milestone I
+## DSCI 532 Data Visualization II &mdash; Milestone I
 **Date:** 2019-01-12<br>
 **Collaborators:** Jim Pushor, Jack Yang
 
