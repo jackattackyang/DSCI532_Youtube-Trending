@@ -18,28 +18,31 @@ ui <- fluidPage(
    titlePanel("YouTube Trending Analytics",
               windowTitle = "Trend Now"),
    
-   sidebarLayout(
-      sidebarPanel(
-        
+   fluidRow(
+      column(4 , 
+        wellPanel(
          selectInput(
-           "engagement", "", c("Views", 
+           "engagement", "Type of engagement", c("Views", 
                                "Likes",
                                "Dislikes",
                                "Comment_Count")
            ),
-         helpText("Trending Videos from Nov. 2017 - June 2018"),
-         
-         selectInput(
-           "time", "", c("Time of Day", 
-                         "Day of Week")
+         helpText("")
          ),
-         helpText("Trending Videos from Nov. 2017 - June 2018"),
-         
-         selectInput(
-           "category", "", choice = choices_num
-         ),
-         helpText("Trending Videos from Nov. 2017 - June 2018")
-         
+        div(style = "height:300px; background-color: white;"), 
+        wellPanel(h3("Trending Videos by Time"), 
+           selectInput(
+             "time", "Time frame", c("Time of Day", 
+                           "Day of Week")
+           ),
+           helpText("Trending Videos from Nov. 2017 - June 2018"),
+      
+           selectInput(
+             "category", "Category", choice = choices_num
+           ),
+           helpText("Category (Number of Trending Videos)")
+           
+           )
          ),
       
       mainPanel(
@@ -91,7 +94,8 @@ server <- function(input, output) {
          select(publish_time, category) %>% 
          filter(category %in% selected_choice) %>% 
          ggplot() + geom_bar(aes(wday(publish_time, label = TRUE))) +
-         labs(x="", y="Videos Uploaded")
+         labs(x="", y="Videos Uploaded") +
+         scale_y_continuous(labels = comma)
      }
      else {
        df %>% 
@@ -103,7 +107,8 @@ server <- function(input, output) {
                 time = make_datetime(hour = hours, min = minutes, sec = seconds)) %>% 
          ggplot() + geom_freqpoly(aes(time)) +
          scale_x_datetime(date_breaks = "3 hours", date_labels = "%H:%M") +
-         labs(x="", y="Videos Uploaded")
+         labs(x="", y="Videos Uploaded") +
+         scale_y_continuous(labels = comma)
      }
      
    })
