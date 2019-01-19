@@ -21,4 +21,6 @@ df <- df %>% left_join(category_df, by=c("category_id" = "id"))
 
 df %>% View()
 
+df$category <- df$category %>% as_factor() 
+
 saveRDS(df, file="data/clean_df.rds")
