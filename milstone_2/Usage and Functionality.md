@@ -14,29 +14,29 @@ This panel allows the user to explore the level of engagement of trending videos
 <br>
 The number of trending videos can be visualized by their upload times throughout the day. As we can see, popular content creators tend to upload videos in the late afternoon.
 
-![](img/panel2a.PNG)
+![](img/panel2a.png)
 
 These trends can also be visualized by distinct categories. There are some variations across genre.
 
-![](img/panel2b.PNG)
+![](img/panel2b.png)
 
 In addition of time of the day, users can observe trends through days of the week. Perhaps it is a little surprising, weekdays are a much busier time for popular content creators than the weekends.
 
-![](img/panel2c.PNG)
+![](img/panel2c.png)
 
 This feature can also be toggled through the different categories.
 
-![](img/panel2d.PNG)
+![](img/panel2d.png)
 
 ### Panel 3
 #### Trending Words using WordCloud2
 
 It is overwhelming for a content creator to gain insight into how to construct title and description compositions while randomly scrolling through pages or raw data. We feel that wordclouds are an effective and engaging tool to provide this insight. Quite simply, the user chooses either Title or Description to produce a modest wordcloud. This image is also interactive in the sense that a user can hover over a word to see the frequency of it occurring. The words have been filtered to remove web addresses, 'non-words' and company names like: youtube.com, instagram.com, twitter.com. These expressions were not adding significant value for creative inspiration. We chose to perform backend cleaning by adding custom stop-words to assist with bringing the valuable words to the top. Future consideration is being given to utilizing regex expressions to help automate the task of filtering patterns of low-value words. Lastly, we will be implementing the ability to choose a specific category in future releases. We chose to keep it simple to assist with initial implementation and testing.
 
-![](img/panelWCa.PNG)
+![](img/panelWCa.png)
 This is an example of the Title Wordcloud.
 
-![](img/panelWCb.PNG)
+![](img/panelWCb.png)
 
 This is a screenshot of the Descriptive Wordcloud.
 ### Overall Considerations and Vision
