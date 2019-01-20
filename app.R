@@ -1,4 +1,8 @@
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(forcats)
+library(readr)
 library(lubridate)
 library(scales)
 library(shiny)
@@ -21,32 +25,32 @@ my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
                                     "ninstagram", "nfacebook", "ntwitter",
                                     "nsubscribe", "nwatch"))
 
-tidytitle<- tidytitle %>%
-  anti_join(stop_words)
-
-tidytitle<- tidytitle %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
-  anti_join(my_stopwords)
-
+# tidytitle<- tidytitle %>%
+#   anti_join(stop_words)
+# 
+# tidytitle<- tidytitle %>%
+#   filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
+#   anti_join(my_stopwords)
+# 
 titletokens <- tidytitle %>%
   count(word, sort=TRUE)
 
 titletokens <- titletokens%>%
   top_n(100, n)
-#filter(n > 250)
-#wordcloud2(size = 1)
-
+# #filter(n > 250)
+# #wordcloud2(size = 1)
+# 
 ## Description dataframe
 tidydescrip <- dat %>%
   unnest_tokens(word, description)
-
-tidydescrip<- tidydescrip %>%
-  anti_join(stop_words)
-
-tidydescrip<- tidydescrip %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
-  anti_join(my_stopwords)
-
+# 
+# tidydescrip<- tidydescrip %>%
+#   anti_join(stop_words)
+# 
+# tidydescrip<- tidydescrip %>%
+#   filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
+#   anti_join(my_stopwords)
+# 
 descriptokens <- tidydescrip %>%
   count(word, sort=TRUE)
 
@@ -189,10 +193,10 @@ server <- function(input, output) {
    output$wordcloud2 <- renderWordcloud2({
      # wordcloud2(demoFreqC, size=input$size)
      #wordcloud2(titletokens, size=input$size)
+    
      text <- switch(input$text,
                     Title = titletokens,
                     Description = descriptokens)
-     
      wordcloud2(text, size=0.7)
      
      # if (input$title) {
