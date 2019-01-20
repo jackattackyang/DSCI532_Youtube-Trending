@@ -5,7 +5,7 @@ January 19, 2019
 ### Panel 1
 #### Engagement
 <br>
-![](img/panel1.PNG)
+![](img/panel1.png)
 
 This panel allows the user to explore the level of engagement of trending videos across different categories on YouTube. The four options are: "Views", "Likes", "Dislikes" and "Comment Count". The graph is visualized as a boxplot in order to showcase the outliers and rough distribution of all these trending videos in their respective categories. Users can get a general feel for how much engagement is typically required to get a video on the frontpage of YouTube.
 
