@@ -1,13 +1,11 @@
-library(dplyr)
-library(ggplot2)
-library(stringr)
-library(forcats)
-library(readr)
-library(lubridate)
+
+library(tidyverse)
 library(scales)
 library(shiny)
 library(wordcloud2)
 library(tidytext)
+library(shinythemes)
+library(shinydashboard)
 
 df <- read_rds("data/clean_df.rds")
 dat <- df
@@ -48,82 +46,67 @@ choices_num <- paste0(choices_df[["category"]], " (", choices_df[["n"]], ")")
 choices_num <- c("Select All", choices_num)
 
 ui <- fluidPage(
-
-   titlePanel("YouTube Trending Analytics",
-              windowTitle = "Trend Now"),
-
-   fluidRow(
-      column(4 ,
-        wellPanel(
+  fluidPage(theme = shinytheme("yeti"),
+   titlePanel(fluidRow("YouTube Trending Analytics", style = "height:50px;background-color:#36454f;color:white;line-height:20px;padding: 20px;")),
+   
+   sidebarLayout(position = "left",
+                 sidebarPanel(
+                   
+       conditionalPanel(condition="input.conditionedPanels==1",
          selectInput(
            "engagement", "Type of engagement", c("Views",
                                "Likes",
                                "Dislikes",
                                "Comment Count"="Comment_Count")
-           ),
-         helpText("")
-         ),
-        div(style = "height:300px; background-color: white;"),
-        wellPanel(h3("Trending Videos by Time"),
-           selectInput(
-             "time", "Time frame", c("Time of Day",
-                           "Day of Week")
-           ),
-           helpText("Trending Videos from Nov. 2017 - June 2018"),
+                         ),
+         helpText("Boxplot showcases distribution and median metrics by category")
+                     ),
+       
+       conditionalPanel(condition="input.conditionedPanels==2",
+              selectInput(
+                "time", "Video Upload Time", c("Time of Day",
+                                        "Day of Week")
+                          ),
+                          helpText("Graph shows video upload times for trending YouTube videos. Users may use this a guideline for upload times of the most popular content creators"),
+               selectInput(
+                 "category", "Category", choice = choices_num
+                           ),
+                           helpText("Category (Number of Trending Videos)")
 
-           selectInput(
-             "category", "Category", choice = choices_num
-           ),
-           helpText("Category (Number of Trending Videos)")
-
-           ),
-
-        div(style = "height:125px; background-color: white;"),
-
-        wellPanel(
-          radioButtons("text", "Choose Source:",
-                       c("Title",
-                         "Description"))
-        )
-         ),
-
-      mainPanel(
-         plotOutput("boxPlot"),
-         plotOutput("timePlot"),
-
-           #numericInput('size', 'Size of wordcloud', n),
-
-
-           # checkboxInput(inputId = "title",
-           #               label = strong("Show title words"),
-           #               value = FALSE),
-           #
-           # checkboxInput(inputId = "description",
-           #               label = strong("Show description words"),
-           #               value = FALSE),
-
-           wordcloud2Output('wordcloud2')
-
-
-      )
+                 
+                     ),
+       conditionalPanel(condition="input.conditionedPanels==3",
+                        radioButtons(
+                                         "text", "Choose Source:",
+                                         c("Title", "Description")),
+                                       selectInput(
+                                         "categoryw", "Category", choice = choices_num
+                                       ),
+                                       helpText("Category (Number of Trending Videos)")
+                 )),
+       mainPanel(
+         tabsetPanel(id = "conditionedPanels",
+                     tabPanel("Engagement by Category", value=1, plotOutput("boxPlot")),
+                     tabPanel("Trend in Time", value=2, plotOutput("timePlot")),
+                     tabPanel("Popular Words", value=3, wordcloud2Output('wordcloud2'))
+         )
+       ))
    )
 )
-
-# Define server logic required to draw a histogram
 server <- function(input, output) {
 
-  output$barPlot <- renderPlot({
-    df %>%
-      group_by(category) %>%
-      summarise(likes = sum(as.numeric(!!rlang::sym(str_to_lower(input$engagement)))),
-                n = n(), avg = likes/n) %>%
-      ggplot() +
-      geom_boxplot(aes(fct_reorder(category, avg), fill = category)) +
-      scale_y_continuous(labels = comma) +
-      labs(x="", y=paste(input$engagement, "per Video")) +
-      theme(legend.position = "none") +
-      coord_flip()
-  })
+  # output$barPlot <- renderPlot({
+  #   df %>%
+  #     group_by(category) %>%
+  #     summarise(likes = sum(as.numeric(!!rlang::sym(str_to_lower(input$engagement)))),
+  #               n = n(), avg = likes/n) %>%
+  #     ggplot() +
+  #     geom_boxplot(aes(fct_reorder(category, avg), fill = category)) +
+  #     scale_y_continuous(labels = comma) +
+  #     labs(x="", y=paste(input$engagement, "per Video")) +
+  #     theme(legend.position = "none") +
+  #     coord_flip()
+  # })
 
   output$boxPlot <- renderPlot({
     df %>%
@@ -133,7 +116,9 @@ server <- function(input, output) {
                        fill = category)) +
       scale_y_log10(labels = comma) +
       labs(x="", y=paste(input$engagement, "per Video")) +
-      theme(legend.position = "none") +
+      theme(legend.position = "none") + 
+      theme(axis.text=element_text(size=14),
+            axis.title=element_text(size=14,face="bold")) +
       coord_flip()
   })
 
@@ -151,7 +136,9 @@ server <- function(input, output) {
         select(publish_time, category) %>%
         filter(category %in% selected_choice) %>%
         ggplot() + geom_bar(aes(wday(publish_time, label = TRUE))) +
-        labs(x="", y="Videos Uploaded") +
+        labs(x="", y="Videos Uploaded") + 
+        theme(axis.text=element_text(size=14),
+              axis.title=element_text(size=14,face="bold")) +
         scale_y_continuous(labels = comma)
     }
     else {
@@ -164,7 +151,9 @@ server <- function(input, output) {
                time = make_datetime(hour = hours, min = minutes, sec = seconds)) %>%
         ggplot() + geom_freqpoly(aes(time)) +
         scale_x_datetime(date_breaks = "3 hours", date_labels = "%H:%M") +
-        labs(x="", y="Videos Uploaded") +
+        labs(x="", y="Videos Uploaded") + 
+        theme(axis.text=element_text(size=14),
+              axis.title=element_text(size=14,face="bold")) +
         scale_y_continuous(labels = comma)
     }
 
