@@ -1,3 +1,4 @@
+
 library(dplyr)
 library(ggplot2)
 library(stringr)
@@ -34,7 +35,7 @@ df_descript <- df %>%
   anti_join(stop_words) %>%
   anti_join(my_stopwords) %>%
   filter(!str_detect(word, "[^0-9a-zA-Z]")) 
-  
+
 
 ## Globals for other panels
 choices_df <- df %>% 
@@ -78,14 +79,14 @@ ui <- fluidPage(
            
            div(style = "height:125px; background-color: white;"),
            wellPanel(h3("Trending Words of Video Title/Description"),
-                    radioButtons(
+                     radioButtons(
                        "text", "Choose Source:",
-                        c("Title", "Description")),
-                    selectInput(
-                            "categoryw", "Category", choice = choices_num
-                          ),
-                    helpText("Category (Number of Trending Videos)")
-            )
+                       c("Title", "Description")),
+                     selectInput(
+                       "categoryw", "Category", choice = choices_num
+                     ),
+                     helpText("Category (Number of Trending Videos)")
+           )
            
     ),
     
@@ -93,7 +94,7 @@ ui <- fluidPage(
       plotOutput("boxPlot"),
       plotOutput("timePlot"),
       wordcloud2Output('wordcloud2')
-      )
+    )
   )
 )
 
@@ -124,7 +125,7 @@ server <- function(input, output) {
       theme(legend.position = "none") +
       coord_flip()
   })
- 
+  
   output$timePlot <- renderPlot({ 
     
     if (input$category %in% "Select All") {
@@ -183,7 +184,7 @@ server <- function(input, output) {
     }
   })
 }    
-    
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
