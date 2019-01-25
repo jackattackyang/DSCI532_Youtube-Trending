@@ -31,35 +31,12 @@ df_title <- df %>%
   anti_join(my_stopwords) %>%
   filter(!str_detect(word, "[^0-9a-zA-Z]"))
 
-tidytitle<- tidytitle %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
-  anti_join(my_stopwords)
+df_descript <- df %>%
+  unnest_tokens(word, description) %>%
+  anti_join(stop_words) %>%
+  anti_join(my_stopwords) %>%
+  filter(!str_detect(word, "[^0-9a-zA-Z]"))
 
-titletokens <- tidytitle %>%
-  count(word, sort=TRUE)
-
-titletokens <- titletokens%>%
-  top_n(100, n)
-#filter(n > 250)
-#wordcloud2(size = 1)
-
-# Description dataframe
-tidydescrip <- dat %>%
-  unnest_tokens(word, description)
-
-tidydescrip<- tidydescrip %>%
-  anti_join(stop_words)
-
-tidydescrip<- tidydescrip %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
-  anti_join(my_stopwords)
-#
-descriptokens <- tidydescrip %>%
-  count(word, sort=TRUE)
-
-descriptokens<-descriptokens%>%
-  top_n(100, n)
-#wordcloud2(size = 0.5, shape = "oval")
 
 ## Globals for other panels
 choices_df <- df %>%
@@ -135,85 +112,92 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-   # output$barPlot <- renderPlot({
-   #   df %>%
-   #     group_by(category) %>%
-   #     summarise(likes = sum(as.numeric(!!rlang::sym(str_to_lower(input$engagement)))),
-   #               n = n(), avg = likes/n) %>%
-   #     ggplot() +
-   #     geom_boxplot(aes(fct_reorder(category, avg), fill = category)) +
-   #     scale_y_continuous(labels = comma) +
-   #     labs(x="", y=paste(input$engagement, "per Video")) +
-   #     theme(legend.position = "none") +
-   #     coord_flip()
-   # })
+  output$barPlot <- renderPlot({
+    df %>%
+      group_by(category) %>%
+      summarise(likes = sum(as.numeric(!!rlang::sym(str_to_lower(input$engagement)))),
+                n = n(), avg = likes/n) %>%
+      ggplot() +
+      geom_boxplot(aes(fct_reorder(category, avg), fill = category)) +
+      scale_y_continuous(labels = comma) +
+      labs(x="", y=paste(input$engagement, "per Video")) +
+      theme(legend.position = "none") +
+      coord_flip()
+  })
 
-   output$boxPlot <- renderPlot({
-     df %>%
-       ggplot() +
-       geom_boxplot(aes(fct_reorder(category, !!rlang::sym(str_to_lower(input$engagement))),
-                        !!rlang::sym(str_to_lower(input$engagement)),
-                        fill = category)) +
-       scale_y_log10(labels = comma) +
-       labs(x="", y=paste(input$engagement, "per Video")) +
-       theme(legend.position = "none") +
-       theme(axis.text=element_text(size=14),
-             axis.title=element_text(size=14,face="bold")) +
-       coord_flip()
-   })
+  output$boxPlot <- renderPlot({
+    df %>%
+      ggplot() +
+      geom_boxplot(aes(fct_reorder(category, !!rlang::sym(str_to_lower(input$engagement))),
+                       !!rlang::sym(str_to_lower(input$engagement)),
+                       fill = category)) +
+      scale_y_log10(labels = comma) +
+      labs(x="", y=paste(input$engagement, "per Video")) +
+      theme(legend.position = "none") +
+      coord_flip()
+  })
 
-   output$timePlot <- renderPlot({
+  output$timePlot <- renderPlot({
 
-     if (input$category %in% "Select All") {
-       selected_choice <- choices[-1]
-     }
-     else {
-       selected_choice <- str_extract(input$category, choices)
-     }
+    if (input$category %in% "Select All") {
+      selected_choice <- choices[-1]
+    }
+    else {
+      selected_choice <- str_extract(input$category, choices)
+    }
 
-     if (input$time == "Day of Week") {
-       df %>%
-         select(publish_time, category) %>%
-         filter(category %in% selected_choice) %>%
-         ggplot() + geom_bar(aes(wday(publish_time, label = TRUE))) +
-         labs(x="", y="Videos Uploaded") +
-         scale_y_continuous(labels = comma)
-     }
-     else {
-       df %>%
-         select(publish_time, category) %>%
-         filter(category %in% selected_choice) %>%
-         mutate(hours = hour(publish_time),
-                minutes = minute(publish_time),
-                seconds = second(publish_time),
-                time = make_datetime(hour = hours, min = minutes, sec = seconds)) %>%
-         ggplot() + geom_freqpoly(aes(time)) +
-         scale_x_datetime(date_breaks = "3 hours", date_labels = "%H:%M") +
-         labs(x="", y="Videos Uploaded") +
-         scale_y_continuous(labels = comma)
-     }
+    if (input$time == "Day of Week") {
+      df %>%
+        select(publish_time, category) %>%
+        filter(category %in% selected_choice) %>%
+        ggplot() + geom_bar(aes(wday(publish_time, label = TRUE))) +
+        labs(x="", y="Videos Uploaded") +
+        scale_y_continuous(labels = comma)
+    }
+    else {
+      df %>%
+        select(publish_time, category) %>%
+        filter(category %in% selected_choice) %>%
+        mutate(hours = hour(publish_time),
+               minutes = minute(publish_time),
+               seconds = second(publish_time),
+               time = make_datetime(hour = hours, min = minutes, sec = seconds)) %>%
+        ggplot() + geom_freqpoly(aes(time)) +
+        scale_x_datetime(date_breaks = "3 hours", date_labels = "%H:%M") +
+        labs(x="", y="Videos Uploaded") +
+        scale_y_continuous(labels = comma)
+    }
 
-   })
+  })
 
-   output$wordcloud2 <- renderWordcloud2({
-     # wordcloud2(demoFreqC, size=input$size)
-     #wordcloud2(titletokens, size=input$size)
+  output$wordcloud2 <- renderWordcloud2({
 
-     text <- switch(input$text,
-                    Title = titletokens,
-                    Description = descriptokens)
-     wordcloud2(text, size=0.7)
+    if (input$categoryw %in% "Select All") {
+      selected_choicew <- choices[-1]
+    }
+    else {
+      selected_choicew <- str_extract(input$categoryw, choices)
+    }
 
-     # if (input$title) {
-     #     wordcloud2(titletokens, size=1)
-     # }
-     #
-     # else if (input$description) {
-     #     wordcloud2(descriptokens, size = 0.5, shape = "oval")
-     # }
-
-   })
+    if(input$text == "Title") {
+      df_title %>%
+        filter(category %in% selected_choicew) %>%
+        count(word, sort=TRUE)%>%
+        top_n(100, n) %>%
+        wordcloud2(size=0.5, shape = "oval")
+    }
+    else {
+      df_descript %>%
+        filter(category %in% selected_choicew) %>%
+        count(word, sort=TRUE)%>%
+        top_n(100, n) %>%
+        wordcloud2(size=0.5, shape = "oval")
+    }
+  })
 }
+
 
 # Run the application
 shinyApp(ui = ui, server = server)
+
+   
