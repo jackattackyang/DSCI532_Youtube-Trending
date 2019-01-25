@@ -23,7 +23,7 @@ my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
                                     "ninstagram", "nfacebook", "ntwitter",
                                     "nsubscribe", "nwatch"))
 
-df_title <- df %>% 
+df_title <- df %>%
   unnest_tokens(word, title) %>%
   anti_join(stop_words) %>%
   anti_join(my_stopwords) %>%
