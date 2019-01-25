@@ -49,6 +49,7 @@ ui <- fluidPage(
   fluidPage(theme = shinytheme("yeti"),
    titlePanel(fluidRow("YouTube Trending Analytics", style = "height:50px;background-color:#36454f;color:white;line-height:20px;padding: 20px;")),
    
+   # conditional panels are added for tabs
    sidebarLayout(position = "left",
                  sidebarPanel(
                    
@@ -84,6 +85,7 @@ ui <- fluidPage(
                                        ),
                                        helpText("Category (Number of Trending Videos)")
                  )),
+       # conditional panels for plots
        mainPanel(
          tabsetPanel(id = "conditionedPanels",
                      tabPanel("Engagement by Category", value=1, plotOutput("boxPlot")),
@@ -107,7 +109,8 @@ server <- function(input, output) {
   #     theme(legend.position = "none") +
   #     coord_flip()
   # })
-
+  
+  # boxplot outputs
   output$boxPlot <- renderPlot({
     df %>%
       ggplot() +
@@ -121,7 +124,8 @@ server <- function(input, output) {
             axis.title=element_text(size=14,face="bold")) +
       coord_flip()
   })
-
+  
+  # timeplot outputs
   output$timePlot <- renderPlot({
 
     if (input$category %in% "Select All") {
@@ -158,7 +162,8 @@ server <- function(input, output) {
     }
 
   })
-
+  
+  # wordcloud filtering is added to remove stopwords
   output$wordcloud2 <- renderWordcloud2({
 
     if (input$categoryw %in% "Select All") {
