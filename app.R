@@ -25,31 +25,31 @@ my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
                                     "ninstagram", "nfacebook", "ntwitter",
                                     "nsubscribe", "nwatch"))
 
-# tidytitle<- tidytitle %>%
-#   anti_join(stop_words)
-# 
-# tidytitle<- tidytitle %>%
-#   filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
-#   anti_join(my_stopwords)
-# 
+tidytitle<- tidytitle %>%
+  anti_join(stop_words)
+
+tidytitle<- tidytitle %>%
+  filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
+  anti_join(my_stopwords)
+
 titletokens <- tidytitle %>%
   count(word, sort=TRUE)
 
 titletokens <- titletokens%>%
   top_n(100, n)
-# #filter(n > 250)
-# #wordcloud2(size = 1)
-# 
-## Description dataframe
+#filter(n > 250)
+#wordcloud2(size = 1)
+
+# Description dataframe
 tidydescrip <- dat %>%
   unnest_tokens(word, description)
-# 
-# tidydescrip<- tidydescrip %>%
-#   anti_join(stop_words)
-# 
-# tidydescrip<- tidydescrip %>%
-#   filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
-#   anti_join(my_stopwords)
+
+tidydescrip<- tidydescrip %>%
+  anti_join(stop_words)
+
+tidydescrip<- tidydescrip %>%
+  filter(!str_detect(word, "[^0-9a-zA-Z]")) %>%
+  anti_join(my_stopwords)
 # 
 descriptokens <- tidydescrip %>%
   count(word, sort=TRUE)
@@ -79,7 +79,7 @@ ui <- fluidPage(
            "engagement", "Type of engagement", c("Views", 
                                "Likes",
                                "Dislikes",
-                               "Comment_Count")
+                               "Comment Count"="Comment_Count")
            ),
          helpText("")
          ),
@@ -132,18 +132,18 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
    
-   output$barPlot <- renderPlot({
-     df %>% 
-       group_by(category) %>% 
-       summarise(likes = sum(as.numeric(!!rlang::sym(str_to_lower(input$engagement)))), 
-                 n = n(), avg = likes/n) %>% 
-       ggplot() + 
-       geom_boxplot(aes(fct_reorder(category, avg), fill = category)) +
-       scale_y_continuous(labels = comma) +
-       labs(x="", y=paste(input$engagement, "per Video")) +
-       theme(legend.position = "none") +
-       coord_flip()
-   })
+   # output$barPlot <- renderPlot({
+   #   df %>% 
+   #     group_by(category) %>% 
+   #     summarise(likes = sum(as.numeric(!!rlang::sym(str_to_lower(input$engagement)))), 
+   #               n = n(), avg = likes/n) %>% 
+   #     ggplot() + 
+   #     geom_boxplot(aes(fct_reorder(category, avg), fill = category)) +
+   #     scale_y_continuous(labels = comma) +
+   #     labs(x="", y=paste(input$engagement, "per Video")) +
+   #     theme(legend.position = "none") +
+   #     coord_flip()
+   # })
    
    output$boxPlot <- renderPlot({    
      df %>% 
@@ -154,6 +154,8 @@ server <- function(input, output) {
        scale_y_log10(labels = comma) +
        labs(x="", y=paste(input$engagement, "per Video")) +
        theme(legend.position = "none") +
+       theme(axis.text=element_text(size=14),
+             axis.title=element_text(size=14,face="bold")) +
        coord_flip()
    })
    
