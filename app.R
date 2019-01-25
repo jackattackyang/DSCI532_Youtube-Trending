@@ -33,7 +33,7 @@ df_descript <- df %>%
   unnest_tokens(word, description) %>%
   anti_join(stop_words) %>%
   anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
+  filter(!str_detect(word, "[^0-9a-zA-Z]")) 
   
 
 ## Globals for other panels
@@ -160,27 +160,27 @@ server <- function(input, output) {
   
   output$wordcloud2 <- renderWordcloud2({
     
-      if (input$categoryw %in% "Select All") {
-        selected_choicew <- choices[-1]
-      }
-      else {
-        selected_choicew <- str_extract(input$categoryw, choices)
-      }
-      
-      if(input$text == "Title") {
-        df_title %>% 
-          filter(category %in% selected_choicew) %>%
-          count(word, sort=TRUE)%>%
-          top_n(100, n) %>%
-          wordcloud2(size=0.5, shape = "oval")
-      }
-      else {
-        df_descript %>% 
-          filter(category %in% selected_choicew) %>%
-          count(word, sort=TRUE)%>%
-          top_n(100, n) %>%
-          wordcloud2(size=0.5, shape = "oval")
-      }
+    if (input$categoryw %in% "Select All") {
+      selected_choicew <- choices[-1]
+    }
+    else {
+      selected_choicew <- str_extract(input$categoryw, choices)
+    }
+    
+    if(input$text == "Title") {
+      df_title %>% 
+        filter(category %in% selected_choicew) %>%
+        count(word, sort=TRUE)%>%
+        top_n(100, n) %>%
+        wordcloud2(size=0.5, shape = "oval")
+    }
+    else {
+      df_descript %>% 
+        filter(category %in% selected_choicew) %>%
+        count(word, sort=TRUE)%>%
+        top_n(100, n) %>%
+        wordcloud2(size=0.5, shape = "oval")
+    }
   })
 }    
     
