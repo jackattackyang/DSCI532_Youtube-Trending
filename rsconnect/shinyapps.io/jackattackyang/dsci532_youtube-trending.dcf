@@ -5,6 +5,6 @@ account: jackattackyang
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 656027
-bundleId: 1824718
+bundleId: 1824737
 url: https://jackattackyang.shinyapps.io/dsci532_youtube-trending/
-when: 1547946447.56331
+when: 1547947665.42158
