@@ -6,34 +6,15 @@ library(scales)
 library(wordcloud2)
 library(tidytext)
 
+# cleaned df
 df <- read_rds("data/clean_df.rds")
-dat <- df
 
-## Word Cloud
-tidytitle <- dat %>%
-  unnest_tokens(word, title)
-
-my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
-                                    "https", "nhttps", "bit.ly",
-                                    "www.youtube.com", "youtube", "2017",
-                                    "2018", "goo.gl", "nfollow", "video",
-                                    "videos", "youtu.be", "facebook", "twitter",
-                                    "ninstagram", "nfacebook", "ntwitter",
-                                    "nsubscribe", "nwatch"))
-
-df_title <- df %>%
-  unnest_tokens(word, title) %>%
-  anti_join(stop_words) %>%
-  anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
-
-df_descript <- df %>%
-  unnest_tokens(word, description) %>%
-  anti_join(stop_words) %>%
-  anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
-
-## Globals for other panels
+# wordcloud globals
+df_title <- read_rds("data/df_title.rds")
+df_descript <- read_rds("data/df_descript.rds")
+figPath = system.file("data/youtubelogo.PNG", package = "wordcloud2")
+figPath
+## globals for other panels
 choices_df <- df %>%
   select(category) %>%
   mutate(category = as.character(category)) %>%
@@ -181,15 +162,15 @@ server <- function(input, output) {
       df_title %>%
         filter(category %in% selected_choicew) %>%
         count(word, sort=TRUE)%>%
-        top_n(100, n) %>%
-        wordcloud2(size=0.5, shape = "oval")
+        top_n(200, n) %>%
+        wordcloud2(size=0.7)
     }
     else {
       df_descript %>%
         filter(category %in% selected_choicew) %>%
         count(word, sort=TRUE)%>%
-        top_n(100, n) %>%
-        wordcloud2(size=0.5, shape = "oval")
+        top_n(200, n) %>%
+        wordcloud2(size=0.7)
     }
   })
 }
