@@ -1,22 +1,3 @@
-Reflection on the usefulness of the feedback you received.
-Here are some questions to get some ideas flowing. You aren't expected to (and probably shouldn't) answer all of these questions.
-Reflect on the usability of your app. How easy or hard was it for your peers to use your app? Did you expect them to use the app in they way they did?
-What things did you hear that's similar across reviewers? Is there a theme here?
-From the feedback, what things do you think are appropriate to change in your app, particularly given the time frame you have to improve the app?
-What is unreasonable to change, and why? Time restraints? Too technical?
-What feedback was the most/least valuable?
-What part of the feedback process was most/least valuable?
-What did you learn from your experience being a "fly-on-the-wall". Was this useful? Why or why not?
-Did the feedback process lead to an improved app? What parts were valuable? What parts were not valuable?
-Reflection on how your project has changed since Milestone 2, and why.
-More questions to get some ideas flowing:
-Was something too difficult to implement in shiny? Or too time consuming? Say so here.
-Did your objective change?
-Was there a better design choice?
-Exercise 3: Improved Shiny App
-rubric={viz:11, quality:4, accuracy:3}
-Take the feedback you received about your Shiny app and use it to make improvements. Remember, your goal is not to create the perfect shiny app -- it's to make the most critical improvements that you can using the time allocated. There will probably be some amazing features that you'd like your app to have, but would take a very long time to implement -- these aren't the changes we're looking for. They belong on a "wishlist", if you'd like to keep one.
-You'll be graded more heavily on the design this time (last time was more heavily weighted towards functionality/code). Your visualizations should link to the usage scenario and tasks.
 ## Reflection on the usefulness of the feedback you received
 ### Introduction
 <br>
