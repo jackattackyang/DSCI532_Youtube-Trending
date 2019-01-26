@@ -1,15 +1,13 @@
-
-library(tidyverse)
-library(scales)
+library(shinydashboard)
 library(shiny)
+library(tidyverse)
+library(lubridate)
+library(scales)
 library(wordcloud2)
 library(tidytext)
-library(shinythemes)
-library(shinydashboard)
 
 df <- read_rds("data/clean_df.rds")
 dat <- df
-# Global Variables
 
 ## Word Cloud
 tidytitle <- dat %>%
@@ -35,7 +33,6 @@ df_descript <- df %>%
   anti_join(my_stopwords) %>%
   filter(!str_detect(word, "[^0-9a-zA-Z]"))
 
-
 ## Globals for other panels
 choices_df <- df %>%
   select(category) %>%
@@ -45,58 +42,65 @@ choices <- c("Select All", choices_df[["category"]])
 choices_num <- paste0(choices_df[["category"]], " (", choices_df[["n"]], ")")
 choices_num <- c("Select All", choices_num)
 
-ui <- fluidPage(
-  fluidPage(theme = shinytheme("yeti"),
-   titlePanel(fluidRow("YouTube Trending Analytics", style = "height:50px;background-color:#36454f;color:white;line-height:20px;padding: 20px;")),
-   
-   # conditional panels are added for tabs
-   sidebarLayout(position = "left",
-                 sidebarPanel(
-                   
-       conditionalPanel(condition="input.conditionedPanels==1",
-         selectInput(
-           "engagement", "Type of engagement", c("Views",
-                               "Likes",
-                               "Dislikes",
-                               "Comment Count"="Comment_Count")
-                         ),
-         helpText("Boxplot showcases distribution and median metrics by category")
-                     ),
-       
-       conditionalPanel(condition="input.conditionedPanels==2",
-              selectInput(
-                "time", "Video Upload Time", c("Time of Day",
-                                        "Day of Week")
-                          ),
-                          helpText("Graph shows video upload times for trending YouTube videos. Users may use this a guideline for upload times of the most popular content creators"),
-               selectInput(
-                 "category", "Category", choice = choices_num
+
+ui <- dashboardPage(skin = "blue",
+                    
+      dashboardHeader(title="YouTube Trending Analytics", titleWidth =300),
+      
+      dashboardSidebar(
+        
+        sidebarMenu(
+          id = "tabs",
+          #conditional panels allow side bar tabs to change with selection
+          conditionalPanel("input.my_set == 'tab1_val'",
+                           selectInput(
+                             "engagement", "Type of engagement", c("Views",
+                                                                   "Likes",
+                                                                   "Dislikes",
+                                                                   "Comment Count"="Comment_Count"))
+          ),
+          conditionalPanel("input.my_set == 'tab2_val'",
+                           selectInput(
+                             "time", "Video Upload Time", c("Time of Day",
+                                                            "Day of Week")
+                           ),
+                           # textOutput("Graph shows video upload times for trending YouTube videos. 
+                           #          Users may use this a guideline for upload times of the most popular content creators"),
+                           selectInput(
+                             "category", "Category", choice = choices_num
                            ),
                            helpText("Category (Number of Trending Videos)")
-
-                 
-                     ),
-       conditionalPanel(condition="input.conditionedPanels==3",
-                        radioButtons(
-                                         "text", "Choose Source:",
-                                         c("Title", "Description")),
-                                       selectInput(
-                                         "categoryw", "Category", choice = choices_num
-                                       ),
-                                       helpText("Category (Number of Trending Videos)")
-                 )),
-       # conditional panels for plots
-       mainPanel(
-         tabsetPanel(id = "conditionedPanels",
-                     tabPanel("Engagement by Category", value=1, plotOutput("boxPlot")),
-                     tabPanel("Trend in Time", value=2, plotOutput("timePlot")),
-                     tabPanel("Popular Words", value=3, wordcloud2Output('wordcloud2'))
-         )
-       ))
-   )
+                           
+          ),
+          
+          conditionalPanel("input.my_set == 'tab3_val'",
+                           radioButtons("text", "Choose Source:", c("Title", "Description")),
+                           selectInput("categoryw", "Category", choice = choices_num)
+                           
+          )
+          
+        )
+      ),
+      
+      # actual outputs for the plots
+      dashboardBody(
+        tabBox(
+          # The id lets us use input$tabset1 on the server to find the current tab
+          id = "my_set", height = "500px", width = "800px",
+          tabPanel("Engagement by Category", id = "tab1",value='tab1_val', plotOutput("boxPlot")),
+          
+          tabPanel("Trend in Time", id = "tab2", value='tab2_val', plotOutput("timePlot")),
+          
+          tabPanel("Popular Words", id = "tab3", value='tab3_val', wordcloud2Output('wordcloud2'))
+          
+        ) 
 )
-server <- function(input, output) {
+                    
+                    
+)
 
+server <- function(input, output) {
+  
   # output$barPlot <- renderPlot({
   #   df %>%
   #     group_by(category) %>%
@@ -127,14 +131,14 @@ server <- function(input, output) {
   
   # timeplot outputs
   output$timePlot <- renderPlot({
-
+    
     if (input$category %in% "Select All") {
       selected_choice <- choices[-1]
     }
     else {
       selected_choice <- str_extract(input$category, choices)
     }
-
+    
     if (input$time == "Day of Week") {
       df %>%
         select(publish_time, category) %>%
@@ -160,19 +164,19 @@ server <- function(input, output) {
               axis.title=element_text(size=14,face="bold")) +
         scale_y_continuous(labels = comma)
     }
-
+    
   })
   
   # wordcloud filtering is added to remove stopwords
   output$wordcloud2 <- renderWordcloud2({
-
+    
     if (input$categoryw %in% "Select All") {
       selected_choicew <- choices[-1]
     }
     else {
       selected_choicew <- str_extract(input$categoryw, choices)
     }
-
+    
     if(input$text == "Title") {
       df_title %>%
         filter(category %in% selected_choicew) %>%
@@ -190,8 +194,5 @@ server <- function(input, output) {
   })
 }
 
-
-# Run the application
 shinyApp(ui = ui, server = server)
 
-   
