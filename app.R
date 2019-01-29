@@ -6,9 +6,10 @@ library(scales)
 library(wordcloud2)
 library(tidytext)
 
+# cleaned df
 df <- read_rds("data/clean_df.rds")
-dat <- df
 
+<<<<<<< HEAD
 ## Word Cloud
 #tidytitle <- dat %>%
   #unnest_tokens(word, title)
@@ -35,6 +36,14 @@ df_descript <- df %>%
   filter(!str_detect(ngram, "https?|^www|^n+[^aeiou]|.com|_|youtube|twitter|official|facebook"))
 
 ## Globals for other panels
+=======
+# wordcloud globals
+df_title <- read_rds("data/df_title.rds")
+df_descript <- read_rds("data/df_descript.rds")
+figPath = system.file("data/youtubelogo.PNG", package = "wordcloud2")
+figPath
+## globals for other panels
+>>>>>>> upstream/master
 choices_df <- df %>%
   select(category) %>%
   mutate(category = as.character(category)) %>%
@@ -191,6 +200,7 @@ server <- function(input, output) {
         count(ngram, sort=TRUE)%>%
         top_n(100, n) %>%
         wordcloud2(size=0.5, shape = "oval")
+
     }
   })
 }
