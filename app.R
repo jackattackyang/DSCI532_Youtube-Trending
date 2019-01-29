@@ -10,28 +10,29 @@ df <- read_rds("data/clean_df.rds")
 dat <- df
 
 ## Word Cloud
-tidytitle <- dat %>%
-  unnest_tokens(word, title)
+#tidytitle <- dat %>%
+  #unnest_tokens(word, title)
 
-my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
-                                    "https", "nhttps", "bit.ly",
-                                    "www.youtube.com", "youtube", "2017",
-                                    "2018", "goo.gl", "nfollow", "video",
-                                    "videos", "youtu.be", "facebook", "twitter",
-                                    "ninstagram", "nfacebook", "ntwitter",
-                                    "nsubscribe", "nwatch"))
+# my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
+#                                     "https", "nhttps", "bit.ly",
+#                                     "www.youtube.com", "youtube", "2017",
+#                                     "2018", "goo.gl", "nfollow", "video",
+#                                     "videos", "youtu.be", "facebook", "twitter",
+#                                     "ninstagram", "nfacebook", "ntwitter",
+#                                     "nsubscribe", "nwatch"))
 
 df_title <- df %>%
-  unnest_tokens(word, title) %>%
-  anti_join(stop_words) %>%
-  anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
+  unnest_tokens(ngram, title, token="ngrams", n=2) %>%
+  # anti_join(stop_words) %>%
+  # anti_join(my_stopwords) %>%
+  filter(!str_detect(ngram, "/[^0-9a-zA-Z\\s]/")) 
 
 df_descript <- df %>%
-  unnest_tokens(word, description) %>%
+  unnest_tokens(ngram, description, token="ngrams", n=2) %>%
   anti_join(stop_words) %>%
-  anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
+  #anti_join(my_stopwords) %>%
+  filter(!str_detect(ngram, "/[^0-9a-zA-Z\\s]/"))%>%
+  filter(!str_detect(ngram, "https?|^www|^n+[^aeiou]|.com|_|youtube|twitter|official|facebook"))
 
 ## Globals for other panels
 choices_df <- df %>%
@@ -180,14 +181,14 @@ server <- function(input, output) {
     if(input$text == "Title") {
       df_title %>%
         filter(category %in% selected_choicew) %>%
-        count(word, sort=TRUE)%>%
+        count(ngram, sort=TRUE)%>%
         top_n(100, n) %>%
         wordcloud2(size=0.5, shape = "oval")
     }
     else {
       df_descript %>%
         filter(category %in% selected_choicew) %>%
-        count(word, sort=TRUE)%>%
+        count(ngram, sort=TRUE)%>%
         top_n(100, n) %>%
         wordcloud2(size=0.5, shape = "oval")
     }
