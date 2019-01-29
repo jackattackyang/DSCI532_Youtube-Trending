@@ -10,8 +10,14 @@ library(tidytext)
 df <- read_rds("data/clean_df.rds")
 
 # wordcloud globals
-df_title <- read_rds("data/df_title.rds")
-df_descript <- read_rds("data/df_descript.rds")
+df_title_1 <- read_rds("data/df_title_1.rds")
+df_title_2 <- read_rds("data/df_title_2.rds")
+df_title_3 <- read_rds("data/df_title_3.rds")
+
+df_descript_1 <- read_rds("data/df_descript_1.rds")
+df_descript_2 <- read_rds("data/df_descript_2.rds")
+df_descript_3 <- read_rds("data/df_descript_3.rds")
+
 figPath = system.file("data/youtubelogo.PNG", package = "wordcloud2")
 figPath
 ## globals for other panels
@@ -56,6 +62,7 @@ ui <- dashboardPage(skin = "blue",
           
           conditionalPanel("input.my_set == 'tab3_val'",
                            radioButtons("text", "Choose Source:", c("Title", "Description")),
+                           selectInput("ngram", "n words", choice = c("Monogram", "Bigram", "Trigram")),
                            selectInput("categoryw", "Category", choice = choices_num)
                            
           )
@@ -159,18 +166,47 @@ server <- function(input, output) {
     }
     
     if(input$text == "Title") {
-      df_title %>%
-        filter(category %in% selected_choicew) %>%
-        count(word, sort=TRUE)%>%
-        top_n(200, n) %>%
-        wordcloud2(size=0.7)
+      if (input$ngram == "Monogram") {
+        df_title_1 %>%
+          filter(category %in% selected_choicew) %>%
+          count(ngram, sort=TRUE)%>%
+          top_n(200, n) %>%
+          wordcloud2(size=0.7)
+      } else if (input$ngram == "Bigram") {
+        df_title_2 %>%
+          filter(category %in% selected_choicew) %>%
+          count(ngram, sort=TRUE)%>%
+          top_n(200, n) %>%
+          wordcloud2(size=0.7)
+      } else {
+        df_title_3 %>%
+          filter(category %in% selected_choicew) %>%
+          count(ngram, sort=TRUE)%>%
+          top_n(200, n) %>%
+          wordcloud2(size=0.7)
+      }
     }
     else {
-      df_descript %>%
-        filter(category %in% selected_choicew) %>%
-        count(word, sort=TRUE)%>%
-        top_n(200, n) %>%
-        wordcloud2(size=0.7)
+      if (input$ngram == "Monogram") {
+        df_descript_1 %>%
+          filter(category %in% selected_choicew) %>%
+          count(ngram, sort=TRUE)%>%
+          top_n(200, n) %>%
+          wordcloud2(size=0.7)
+      } else if (input$ngram == "Bigram") {
+        df_descript_2 %>%
+          filter(category %in% selected_choicew) %>%
+          count(ngram, sort=TRUE)%>%
+          top_n(200, n) %>%
+          wordcloud2(size=0.7)
+      } else {
+        df_descript_3 %>%
+          filter(category %in% selected_choicew) %>%
+          count(ngram, sort=TRUE)%>%
+          top_n(200, n) %>%
+          wordcloud2(size=0.7)
+      }
+      
     }
   })
 }
