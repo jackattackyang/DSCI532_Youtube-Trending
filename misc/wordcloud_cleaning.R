@@ -1,11 +1,8 @@
 library(tidyverse)
+library(wordcloud2)
 library(tidytext)
 
 df <- read_rds("data/clean_df.rds")
-dat <- df
-
-tidytitle <- dat %>%
-  unnest_tokens(word, title)
 
 my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
                                     "https", "nhttps", "bit.ly",
@@ -15,17 +12,39 @@ my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
                                     "ninstagram", "nfacebook", "ntwitter",
                                     "nsubscribe", "nwatch"))
 
-df_title <- df %>%
-  unnest_tokens(word, title) %>%
-  anti_join(stop_words) %>%
-  anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
+df_title_1 <- df %>%
+  unnest_tokens(ngram, title, token = "ngrams", n = 1) %>% 
+  select(ngram, category)
+  # anti_join(stop_words) %>%
+  # anti_join(my_stopwords) %>%
+  # filter(!str_detect(word, "[^0-9a-zA-Z]"))
 
-df_descript <- df %>%
-  unnest_tokens(word, description) %>%
-  anti_join(stop_words) %>%
-  anti_join(my_stopwords) %>%
-  filter(!str_detect(word, "[^0-9a-zA-Z]"))
+df_descript_1 <- df %>%
+  unnest_tokens(ngram, description, token = "ngrams", n = 1) %>% 
+  select(ngram, category)
+  # anti_join(stop_words) %>%
+  # anti_join(my_stopwords) %>%
+  # filter(!str_detect(word, "[^0-9a-zA-Z]"))
 
-saveRDS(df_title, file="data/df_title.rds")
-saveRDS(df_descript, file="data/df_descript.rds")
+df_title_2 <- df %>%
+  unnest_tokens(ngram, title, token = "ngrams", n = 2) %>% 
+  select(ngram, category)
+df_title_3 <- df %>%
+  unnest_tokens(ngram, title, token = "ngrams", n = 3) %>% 
+  select(ngram, category) 
+
+df_descript_2 <- df %>%
+  unnest_tokens(ngram, description, token = "ngrams", n = 2) %>% 
+  select(ngram, category)
+df_descript_3 <- df %>%
+  unnest_tokens(ngram, description, token = "ngrams", n = 3) %>% 
+  select(ngram, category)
+
+saveRDS(df_title_1, file="data/df_title_1.rds")
+saveRDS(df_title_2, file="data/df_title_2.rds")
+saveRDS(df_title_3, file="data/df_title_3.rds")
+
+saveRDS(df_descript_1, file="data/df_descript_1.rds")
+saveRDS(df_descript_2, file="data/df_descript_2.rds")
+saveRDS(df_descript_3, file="data/df_descript_3.rds")
+
