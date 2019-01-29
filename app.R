@@ -18,8 +18,9 @@ df_descript_1 <- read_rds("data/df_descript_1.rds")
 df_descript_2 <- read_rds("data/df_descript_2.rds")
 df_descript_3 <- read_rds("data/df_descript_3.rds")
 
-figPath = system.file("data/youtubelogo.PNG", package = "wordcloud2")
-figPath
+# wordcloud logo shape that did not work
+# figPath = system.file("data/youtubelogo.PNG", package = "wordcloud2")
+# figPath
 ## globals for other panels
 choices_df <- df %>%
   select(category) %>%
@@ -37,11 +38,13 @@ ui <- dashboardPage(skin = "blue",
       dashboardSidebar(
         
         sidebarMenu(
+          
           id = "tabs",
+          
           #conditional panels allow side bar tabs to change with selection
           conditionalPanel("input.my_set == 'tab1_val'",
                            selectInput(
-                             "engagement", "Type of engagement", c("Views",
+                             "engagement", "Type of Engagement", c("Views",
                                                                    "Likes",
                                                                    "Dislikes",
                                                                    "Comment Count"="Comment_Count"))
@@ -55,14 +58,13 @@ ui <- dashboardPage(skin = "blue",
                            #          Users may use this a guideline for upload times of the most popular content creators"),
                            selectInput(
                              "category", "Category", choice = choices_num
-                           ),
-                           helpText("Category (Number of Trending Videos)")
+                           )
                            
           ),
           
           conditionalPanel("input.my_set == 'tab3_val'",
-                           radioButtons("text", "Choose Source:", c("Title", "Description")),
-                           selectInput("ngram", "n words", choice = c("Monogram", "Bigram", "Trigram")),
+                           radioButtons("text", "Choose Source", c("Title", "Description")),
+                           selectInput("ngram", "1-2-3 Words", choice = c("Monogram", "Bigram", "Trigram")),
                            selectInput("categoryw", "Category", choice = choices_num)
                            
           )
@@ -73,11 +75,12 @@ ui <- dashboardPage(skin = "blue",
       # actual outputs for the plots
       dashboardBody(
         tabBox(
+          title = "Trended YouTube Videos from Nov. 2017 - June 2018",
           # The id lets us use input$tabset1 on the server to find the current tab
           id = "my_set", height = "500px", width = "800px",
           tabPanel("Engagement by Category", id = "tab1",value='tab1_val', plotOutput("boxPlot")),
           
-          tabPanel("Trend in Time", id = "tab2", value='tab2_val', plotOutput("timePlot")),
+          tabPanel("Upload Date", id = "tab2", value='tab2_val', plotOutput("timePlot")),
           
           tabPanel("Popular Words", id = "tab3", value='tab3_val', wordcloud2Output('wordcloud2'))
           
@@ -132,7 +135,7 @@ server <- function(input, output) {
         select(publish_time, category) %>%
         filter(category %in% selected_choice) %>%
         ggplot() + geom_bar(aes(wday(publish_time, label = TRUE))) +
-        labs(x="", y="Videos Uploaded") + 
+        labs(x="", y="Number of Videos Uploaded") + 
         theme(axis.text=element_text(size=14),
               axis.title=element_text(size=14,face="bold")) +
         scale_y_continuous(labels = comma)
@@ -147,7 +150,7 @@ server <- function(input, output) {
                time = make_datetime(hour = hours, min = minutes, sec = seconds)) %>%
         ggplot() + geom_freqpoly(aes(time)) +
         scale_x_datetime(date_breaks = "3 hours", date_labels = "%H:%M") +
-        labs(x="", y="Videos Uploaded") + 
+        labs(x="", y="Number of Videos Uploaded") + 
         theme(axis.text=element_text(size=14),
               axis.title=element_text(size=14,face="bold")) +
         scale_y_continuous(labels = comma)
