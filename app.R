@@ -9,41 +9,14 @@ library(tidytext)
 # cleaned df
 df <- read_rds("data/clean_df.rds")
 
-<<<<<<< HEAD
-## Word Cloud
-#tidytitle <- dat %>%
-  #unnest_tokens(word, title)
-
-# my_stopwords <- data_frame(word = c(as.character(1:10), "nhttp", "http",
-#                                     "https", "nhttps", "bit.ly",
-#                                     "www.youtube.com", "youtube", "2017",
-#                                     "2018", "goo.gl", "nfollow", "video",
-#                                     "videos", "youtu.be", "facebook", "twitter",
-#                                     "ninstagram", "nfacebook", "ntwitter",
-#                                     "nsubscribe", "nwatch"))
-
-df_title <- df %>%
-  unnest_tokens(ngram, title, token="ngrams", n=2) %>%
-  # anti_join(stop_words) %>%
-  # anti_join(my_stopwords) %>%
-  filter(!str_detect(ngram, "/[^0-9a-zA-Z\\s]/")) 
-
-df_descript <- df %>%
-  unnest_tokens(ngram, description, token="ngrams", n=2) %>%
-  anti_join(stop_words) %>%
-  #anti_join(my_stopwords) %>%
-  filter(!str_detect(ngram, "/[^0-9a-zA-Z\\s]/"))%>%
-  filter(!str_detect(ngram, "https?|^www|^n+[^aeiou]|.com|_|youtube|twitter|official|facebook"))
 
 ## Globals for other panels
-=======
 # wordcloud globals
 df_title <- read_rds("data/df_title.rds")
 df_descript <- read_rds("data/df_descript.rds")
 figPath = system.file("data/youtubelogo.PNG", package = "wordcloud2")
 figPath
 ## globals for other panels
->>>>>>> upstream/master
 choices_df <- df %>%
   select(category) %>%
   mutate(category = as.character(category)) %>%
@@ -190,17 +163,16 @@ server <- function(input, output) {
     if(input$text == "Title") {
       df_title %>%
         filter(category %in% selected_choicew) %>%
-        count(ngram, sort=TRUE)%>%
+        count(word, sort=TRUE)%>%
         top_n(100, n) %>%
         wordcloud2(size=0.5, shape = "oval")
     }
     else {
       df_descript %>%
         filter(category %in% selected_choicew) %>%
-        count(ngram, sort=TRUE)%>%
-        top_n(100, n) %>%
-        wordcloud2(size=0.5, shape = "oval")
-
+        count(word, sort=TRUE)%>%
+        top_n(200, n) %>%
+        wordcloud2(size=0.7)
     }
   })
 }
