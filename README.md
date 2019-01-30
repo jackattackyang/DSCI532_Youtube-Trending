@@ -9,5 +9,7 @@ Youtube trending information may not only be interesting to look at but also imp
 
 ## Design
 ![](misc/app1.PNG)
+
 ![](misc/app2.PNG)
+
 ![](misc/app3.PNG)
