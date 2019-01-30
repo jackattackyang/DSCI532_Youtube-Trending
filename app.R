@@ -9,6 +9,8 @@ library(tidytext)
 # cleaned df
 df <- read_rds("data/clean_df.rds")
 
+
+## Globals for other panels
 # wordcloud globals
 df_title_1 <- read_rds("data/df_title_1.rds")
 df_title_2 <- read_rds("data/df_title_2.rds")
