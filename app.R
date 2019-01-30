@@ -5,6 +5,8 @@ library(lubridate)
 library(scales)
 library(wordcloud2)
 library(tidytext)
+library(shinycssloaders)
+
 
 # cleaned df
 df <- read_rds("data/clean_df.rds")
@@ -80,11 +82,11 @@ ui <- dashboardPage(skin = "blue",
           title = "Trended YouTube Videos from Nov. 2017 - June 2018",
           # The id lets us use input$tabset1 on the server to find the current tab
           id = "my_set", height = "500px", width = "800px",
-          tabPanel("Engagement by Category", id = "tab1",value='tab1_val', plotOutput("boxPlot")),
+          tabPanel("Engagement by Category", id = "tab1",value='tab1_val', plotOutput("boxPlot") %>% withSpinner(color="#0dc5c1")),
           
-          tabPanel("Upload Date", id = "tab2", value='tab2_val', plotOutput("timePlot")),
+          tabPanel("Upload Date", id = "tab2", value='tab2_val', plotOutput("timePlot") %>% withSpinner(color="#0dc5c1")),
           
-          tabPanel("Popular Words", id = "tab3", value='tab3_val', wordcloud2Output('wordcloud2'))
+          tabPanel("Popular Words", id = "tab3", value='tab3_val', wordcloud2Output('wordcloud2') %>% withSpinner(color="#0dc5c1"))
           
         ) 
 )
